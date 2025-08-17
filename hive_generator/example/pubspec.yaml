@@ -1,0 +1,12 @@
+name: example
+
+environment:
+  sdk: ">=3.7.2 <4.0.0"
+
+dependencies:
+  hive: ^2.2.3
+
+dev_dependencies:
+  build_runner: ^2.7.0
+  hive_generator:
+    path: ../               # points to your local patched hive_generator
