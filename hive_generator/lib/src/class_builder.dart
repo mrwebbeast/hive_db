@@ -12,7 +12,11 @@ import 'package:source_gen/source_gen.dart';
 import 'type_helper.dart';
 
 class ClassBuilder extends Builder {
-  ClassBuilder(InterfaceElement interface, List<AdapterField> getters, List<AdapterField> setters) : super(interface, getters, setters);
+  ClassBuilder(
+    InterfaceElement interface,
+    List<AdapterField> getters,
+    List<AdapterField> setters,
+  ) : super(interface, getters, setters);
 
   var hiveListChecker = const TypeChecker.fromRuntime(HiveList);
   var listChecker = const TypeChecker.fromRuntime(List);
@@ -23,14 +27,16 @@ class ClassBuilder extends Builder {
 
   @override
   String buildRead() {
-    var constr = interface.constructors.firstOrNullWhere((it) => it.name?.isEmpty == true);
-    check(constr != null, 'Provide an unnamed constructor.');
+    var constr = interface.constructors.firstWhere(
+      (it) => it.name.isEmpty,
+      orElse: () => throw StateError('Provide an unnamed constructor.'),
+    );
 
     // The remaining fields to initialize.
     var fields = setters.toList();
 
     // Empty classes
-    if (constr!.name?.isEmpty == true && fields.isEmpty) {
+    if (constr.name.isEmpty && fields.isEmpty) {
       return 'return ${interface.name}();';
     }
 
@@ -44,15 +50,28 @@ class ClassBuilder extends Builder {
     return ${interface.name}(
     ''');
 
-    for (var param in constr.formalParameters) {
-      var field = fields.firstOrNullWhere((it) => it.name == param.name);
+    for (var param in constr.parameters) {
+      AdapterField? field;
+      try {
+        field = fields.firstWhere((it) => it.name == param.name);
+      } catch (e) {
+        field = null;
+      }
       // Final fields
-      field ??= getters.firstOrNullWhere((it) => it.name == param.name);
+      if (field == null) {
+        try {
+          field = getters.firstWhere((it) => it.name == param.name);
+        } catch (e) {
+          field = null;
+        }
+      }
       if (field != null) {
         if (param.isNamed) {
           code.write('${param.name}: ');
         }
-        code.write(_value(param.type, 'fields[${field.index}]', field.defaultValue));
+        code.write(
+          _value(param.type, 'fields[${field.index}]', field.defaultValue),
+        );
         code.writeln(',');
         fields.remove(field);
       }
@@ -64,7 +83,9 @@ class ClassBuilder extends Builder {
     // as initializing formals. We do so using cascades.
     for (var field in fields) {
       code.write('..${field.name} = ');
-      code.writeln(_value(field.type, 'fields[${field.index}]', field.defaultValue));
+      code.writeln(
+        _value(field.type, 'fields[${field.index}]', field.defaultValue),
+      );
     }
 
     code.writeln(';');
@@ -82,7 +103,8 @@ class ClassBuilder extends Builder {
     var suffix = _suffixFromType(type);
     if (hiveListChecker.isAssignableFromType(type)) {
       return '($variable as HiveList$suffix)$suffix.castHiveList()';
-    } else if (iterableChecker.isAssignableFromType(type) && !isUint8List(type)) {
+    } else if (iterableChecker.isAssignableFromType(type) &&
+        !isUint8List(type)) {
       return '($variable as List$suffix)${_castIterable(type)}';
     } else if (mapChecker.isAssignableFromType(type)) {
       return '($variable as Map$suffix)${_castMap(type)}';
@@ -92,7 +114,8 @@ class ClassBuilder extends Builder {
   }
 
   bool isMapOrIterable(DartType type) {
-    return iterableChecker.isAssignableFromType(type) || mapChecker.isAssignableFromType(type);
+    return iterableChecker.isAssignableFromType(type) ||
+        mapChecker.isAssignableFromType(type);
   }
 
   bool isUint8List(DartType type) {
@@ -157,23 +180,13 @@ class ClassBuilder extends Builder {
     } else
     // Using assignable because Set? and Iterable? are not exactly Set and
     // Iterable
-    if (setChecker.isAssignableFromType(type) || iterableChecker.isAssignableFromType(type)) {
+    if (setChecker.isAssignableFromType(type) ||
+        iterableChecker.isAssignableFromType(type)) {
       var suffix = _accessorSuffixFromType(type);
       return '$accessor$suffix.toList()';
     } else {
       return accessor;
     }
-  }
-}
-
-extension _FirstOrNullWhere<T> on Iterable<T> {
-  T? firstOrNullWhere(bool Function(T) predicate) {
-    for (var it in this) {
-      if (predicate(it)) {
-        return it;
-      }
-    }
-    return null;
   }
 }
 

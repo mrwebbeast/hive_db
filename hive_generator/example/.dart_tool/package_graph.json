@@ -75,7 +75,7 @@
     },
     {
       "name": "analyzer",
-      "version": "8.1.1",
+      "version": "7.7.1",
       "dependencies": [
         "_fe_analyzer_shared",
         "collection",
@@ -260,6 +260,20 @@
       ]
     },
     {
+      "name": "dart_style",
+      "version": "3.1.1",
+      "dependencies": [
+        "analyzer",
+        "args",
+        "collection",
+        "package_config",
+        "path",
+        "pub_semver",
+        "source_span",
+        "yaml"
+      ]
+    },
+    {
       "name": "crypto",
       "version": "3.0.6",
       "dependencies": [
@@ -390,7 +404,7 @@
     },
     {
       "name": "_fe_analyzer_shared",
-      "version": "88.0.0",
+      "version": "85.0.0",
       "dependencies": [
         "meta"
       ]
@@ -542,20 +556,6 @@
       "dependencies": [
         "source_span",
         "string_scanner"
-      ]
-    },
-    {
-      "name": "dart_style",
-      "version": "3.1.2",
-      "dependencies": [
-        "analyzer",
-        "args",
-        "collection",
-        "package_config",
-        "path",
-        "pub_semver",
-        "source_span",
-        "yaml"
       ]
     }
   ],

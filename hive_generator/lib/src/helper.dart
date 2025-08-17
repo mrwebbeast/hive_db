@@ -14,7 +14,10 @@ class HiveFieldInfo {
 
 HiveFieldInfo? getHiveFieldAnn(Element element) {
   // Use TypeChecker's latest API: accepts Element from analyzer
-  final obj = _hiveFieldChecker.firstAnnotationOf(element, throwOnUnresolved: false);
+  final obj = _hiveFieldChecker.firstAnnotationOf(
+    element, 
+    throwOnUnresolved: false,
+  );
   if (obj == null) return null;
 
   // Convert field to correct types

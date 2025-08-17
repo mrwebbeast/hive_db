@@ -9,14 +9,14 @@ environment:
   flutter: ">=3.35.1"
 
 dependencies:
-  build: ^3.0.2
-  source_gen: ^3.1.0
+  build: ^2.1.0
+  source_gen: ^1.5.0
   hive: ^2.2.3
-  analyzer: ^8.1.1
+  analyzer: ^6.0.0
   source_helper: ^1.1.0
 
 dev_dependencies:
   test: ^1.22.0
-  build_test: ^3.3.2       # upgraded to be compatible with build 3.x
-  build_runner: ^2.7.0
+  build_test: ^2.1.0
+  build_runner: ^2.4.13
   lints: ^6.0.0
